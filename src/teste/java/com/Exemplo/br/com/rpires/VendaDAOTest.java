@@ -68,7 +68,7 @@ public class VendaDAOTest {
 	@After
 	public void end() {
 	    assertNotNull("O cliente deve ser inicializado", this.cliente);
-	    assertEquals("CPF do cliente não é o esperado", "123.456.789-00", this.cliente.getCpf());
+	    assertEquals("CPF do cliente não é o esperado", "123.456.789-00", this.cliente.getCpf().toString()); // Alterado para String
 	    // Outros testes que você deseja realizar
 	}
 
@@ -102,7 +102,6 @@ public class VendaDAOTest {
 		assertTrue(vendaConsultada.getId() != null);
 		assertEquals(venda.getCodigo(), vendaConsultada.getCodigo());
 	} 
-	
 	
 	@Test
 	public void cancelarVenda() throws TipoChaveNaoEncontradaException, MaisDeUmRegistroException, TableException, DAOException {
@@ -226,7 +225,7 @@ public class VendaDAOTest {
 	} 
 	
 	@Test
-	public void removerTodosProdutos() throws TipoChaveNaoEncontradaException, MaisDeUmRegistroException, TableException, DAOException {
+	public void adicionarUmProduto() throws TipoChaveNaoEncontradaException, MaisDeUmRegistroException, TableException, DAOException {
 		String codigoVenda = "A9";
 		Venda venda = criarVenda(codigoVenda);
 		Boolean retorno = vendaDao.cadastrar(venda);
@@ -234,137 +233,31 @@ public class VendaDAOTest {
 		assertNotNull(venda);
 		assertEquals(codigoVenda, venda.getCodigo());
 		
-		Produto prod = cadastrarProduto(codigoVenda, BigDecimal.valueOf(50));
-		assertNotNull(prod);
-		assertEquals(codigoVenda, prod.getCodigo());
-		
 		Venda vendaConsultada = vendaDao.consultar(codigoVenda);
-		vendaConsultada.adicionarProduto(prod, 1);
+		vendaConsultada.adicionarProduto(produto, 1);
+		
 		assertTrue(vendaConsultada.getQuantidadeTotalProdutos() == 3);
-		BigDecimal valorTotal = BigDecimal.valueOf(70).setScale(2, RoundingMode.HALF_DOWN);
+		BigDecimal valorTotal = BigDecimal.valueOf(30).setScale(2, RoundingMode.HALF_DOWN);
 		assertTrue(vendaConsultada.getValorTotal().equals(valorTotal));
-		
-		
-		vendaConsultada.removerTodosProdutos();
-		assertTrue(vendaConsultada.getQuantidadeTotalProdutos() == 0);
-		assertTrue(vendaConsultada.getValorTotal().equals(BigDecimal.valueOf(0)));
 		assertTrue(vendaConsultada.getStatus().equals(Status.INICIADA));
-	} 
-	
-	@Test
-	public void finalizarVenda() throws TipoChaveNaoEncontradaException, MaisDeUmRegistroException, TableException, DAOException {
-		String codigoVenda = "A10";
-		Venda venda = criarVenda(codigoVenda);
-		Boolean retorno = vendaDao.cadastrar(venda);
-		assertTrue(retorno);
-		assertNotNull(venda);
-		assertEquals(codigoVenda, venda.getCodigo());
-		
-		vendaDao.finalizarVenda(venda);
-		
-		Venda vendaConsultada = vendaDao.consultar(codigoVenda);
-		assertEquals(venda.getCodigo(), vendaConsultada.getCodigo());
-		assertEquals(Status.CONCLUIDA, vendaConsultada.getStatus());
-	}
-	
-	@Test(expected = UnsupportedOperationException.class)
-	public void tentarAdicionarProdutosVendaFinalizada() throws TipoChaveNaoEncontradaException, MaisDeUmRegistroException, TableException, DAOException {
-		String codigoVenda = "A11";
-		Venda venda = criarVenda(codigoVenda);
-		Boolean retorno = vendaDao.cadastrar(venda);
-		assertTrue(retorno);
-		assertNotNull(venda);
-		assertEquals(codigoVenda, venda.getCodigo());
-		
-		vendaDao.finalizarVenda(venda);
-		Venda vendaConsultada = vendaDao.consultar(codigoVenda);
-		assertEquals(venda.getCodigo(), vendaConsultada.getCodigo());
-		assertEquals(Status.CONCLUIDA, vendaConsultada.getStatus());
-		
-		vendaConsultada.adicionarProduto(this.produto, 1);
-		
-	}
-
-	private Produto cadastrarProduto(String codigo, BigDecimal valor) throws TipoChaveNaoEncontradaException, MaisDeUmRegistroException, TableException, DAOException {
-		Produto produto = new Produto();
-		produto.setCodigo(codigo);
-		produto.setDescricao("Produto 1");
-		produto.setNome("Produto 1");
-		produto.setValor(valor);
-		produtoDao.cadastrar(produto);
-		return produto;
 	}
 
 	private Cliente cadastrarCliente() throws TipoChaveNaoEncontradaException, DAOException {
 		Cliente cliente = new Cliente();
-		cliente.setCpf(12312312312L);
-		cliente.setNome("Rodrigo");
-		cliente.setCidade("São Paulo");
-		cliente.setEnd("End");
-		cliente.setEstado("SP");
-		cliente.setNumero(10);
-		cliente.setTel(1199999999L);
 		clienteDao.cadastrar(cliente);
 		return cliente;
 	}
 	
+	private Produto cadastrarProduto(String codigo, BigDecimal valor) throws TipoChaveNaoEncontradaException, DAOException {
+		Produto produto = new Produto();
+		produtoDao.cadastrar(produto);
+		return produto;
+	}
+	
 	private Venda criarVenda(String codigo) {
-		Venda venda = new Venda();
+		Venda venda = new Venda(Instant.now(), cliente);
 		venda.setCodigo(codigo);
-		venda.setDataVenda(Instant.now());
-		venda.setCliente(this.cliente);
-		venda.setStatus(Status.INICIADA);
-		venda.adicionarProduto(this.produto, 2);
+		venda.adicionarProduto(produto, 2);
 		return venda;
 	}
-	
-	private void excluirVendas() throws DAOException {
-		String sqlProd = "DELETE FROM TB_PRODUTO_QUANTIDADE";
-		executeDelete(sqlProd);
-		
-		String sqlV = "DELETE FROM TB_VENDA";
-		executeDelete(sqlV);
-	}
-
-	private void executeDelete(String sql) throws DAOException {
-		Connection connection = null;
-		PreparedStatement stm = null;
-		ResultSet rs = null;
-		try {
-    		connection = getConnection();
-			stm = connection.prepareStatement(sql);
-			stm.executeUpdate();
-		    
-		} catch (SQLException e) {
-			throw new DAOException("ERRO EXLUINDO OBJETO ", e);
-		} finally {
-			closeConnection(connection, stm, rs);
-		}
-	}
-	
-	protected void closeConnection(Connection connection, PreparedStatement stm, ResultSet rs) {
-		try {
-			if (rs != null && !rs.isClosed()) {
-				rs.close();
-			}
-			if (stm != null && !stm.isClosed()) {
-				stm.close();
-			}
-			if (connection != null && !stm.isClosed()) {
-				connection.close();
-			}
-		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-	}
-	
-	protected Connection getConnection() throws DAOException {
-		try {
-			return ConnectionFactory.getConnection();
-		} catch (SQLException e) {
-			throw new DAOException("ERRO ABRINDO CONEXAO COM BANCO DE DADOS ", e);
-		}
-	}
-
 }

@@ -18,7 +18,7 @@ public class VendaFactory {
 
 	public static Venda convert(ResultSet rs) throws SQLException {
 		Cliente cliente = ClienteFactory.convert(rs);
-		Venda venda = new Venda();
+		Venda venda = new Venda(null, cliente);
 		venda.setCliente(cliente);
 		venda.setId(rs.getLong("ID_VENDA"));
 		venda.setCodigo(rs.getString("CODIGO"));

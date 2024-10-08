@@ -33,6 +33,10 @@ public class Produto implements Persistente {
 	@ColunaTabela(dbName = "valor", setJavaName = "setValor")
 	private BigDecimal valor;
 
+	// Novo campo adicionado
+	@ColunaTabela(dbName = "estoque", setJavaName = "setEstoque")
+	private Integer estoque; // Tipo Integer para a quantidade em estoque
+
 	public String getCodigo() {
 		return codigo;
 	}
@@ -72,5 +76,15 @@ public class Produto implements Persistente {
 	public void setId(Long id) {
 		this.id = id;
 	}
+
+	// Métodos getters e setters para o novo campo estoque
+	public Integer getEstoque() {
+		return estoque;
+	}
+
+	public void setEstoque(Integer estoque) {
+		this.estoque = estoque;
+	}
+
 	
 }

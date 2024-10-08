@@ -1,4 +1,3 @@
-
 /**
  * 
  */
@@ -42,7 +41,6 @@ public class ProdutoDAOTest {
 			try {
 				produtoDao.excluir(prod.getCodigo());
 			} catch (DAOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		});
@@ -54,6 +52,7 @@ public class ProdutoDAOTest {
 		produto.setDescricao("Produto 1");
 		produto.setNome("Produto 1");
 		produto.setValor(BigDecimal.TEN);
+		produto.setEstoque(100); // Definindo um estoque inicial
 		produtoDao.cadastrar(produto);
 		return produto;
 	}
@@ -89,17 +88,20 @@ public class ProdutoDAOTest {
 	
 	@Test
 	public void alterarCliente() throws TipoChaveNaoEncontradaException, DAOException, MaisDeUmRegistroException, TableException {
-		Produto produto = criarProduto("A4");
-		produto.setNome("Rodrigo Pires");
-		produtoDao.alterar(produto);
-		Produto produtoBD = this.produtoDao.consultar(produto.getCodigo());
-		assertNotNull(produtoBD);
-		Assert.assertEquals("Rodrigo Pires", produtoBD.getNome());
-		
-		excluir(produto.getCodigo());
-		Produto produtoBD1 = this.produtoDao.consultar(produto.getCodigo());
-		assertNull(produtoBD1);
+	    Produto produto = criarProduto("A4");
+	    produto.setNome("Rodrigo Pires");
+	    produto.setEstoque(200); // Atualizando o estoque
+	    produtoDao.alterar(produto);
+	    Produto produtoBD = this.produtoDao.consultar(produto.getCodigo());
+	    assertNotNull(produtoBD);
+	    Assert.assertEquals("Rodrigo Pires", produtoBD.getNome());
+	    Assert.assertEquals(Integer.valueOf(200), produtoBD.getEstoque()); // Verificando o estoque
+
+	    excluir(produto.getCodigo());
+	    Produto produtoBD1 = this.produtoDao.consultar(produto.getCodigo());
+	    assertNull(produtoBD1);
 	}
+
 	
 	@Test
 	public void buscarTodos() throws DAOException, TipoChaveNaoEncontradaException {
@@ -116,6 +118,5 @@ public class ProdutoDAOTest {
 		list = produtoDao.buscarTodos();
 		assertTrue(list != null);
 		assertTrue(list.size() == 0);
-		
 	}
 }

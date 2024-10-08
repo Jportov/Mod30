@@ -56,8 +56,9 @@ public class Venda implements Persistente {
 	@ColunaTabela(dbName = "status_venda", setJavaName = "setStatus")
 	private Status status;
 	
-	public Venda() {
+	public Venda(Instant instant, Cliente cliente2) {
 		produtos = new HashSet<>();
+		this.status = Status.INICIADA; // Inicializa o status como INICIADA
 	}
 
 	public String getCodigo() {
@@ -102,7 +103,14 @@ public class Venda implements Persistente {
 			throw new UnsupportedOperationException("IMPOSSÍVEL ALTERAR VENDA FINALIZADA");
 		}
 	}
-	
+
+	public void finalizar() {
+		if (this.status == Status.CONCLUIDA) {
+			throw new UnsupportedOperationException("VENDA JÁ FINALIZADA");
+		}
+		this.status = Status.CONCLUIDA;
+	}
+
 	public void removerProduto(Produto produto, Integer quantidade) {
 		validarStatus();
 		Optional<ProdutoQuantidade> op = 
@@ -117,7 +125,6 @@ public class Venda implements Persistente {
 				produtos.remove(op.get());
 				recalcularValorTotalVenda();
 			}
-			
 		}
 	}
 	
@@ -135,7 +142,6 @@ public class Venda implements Persistente {
 	}
 	
 	public void recalcularValorTotalVenda() {
-		//validarStatus();
 		BigDecimal valorTotal = BigDecimal.ZERO;
 		for (ProdutoQuantidade prod : this.produtos) {
 			valorTotal = valorTotal.add(prod.getValorTotal());
@@ -178,7 +184,4 @@ public class Venda implements Persistente {
 	public void setProdutos(Set<ProdutoQuantidade> produtos) {
 		this.produtos = produtos;
 	}
-	
-	
-	
 }
