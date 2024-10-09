@@ -1,12 +1,5 @@
-/**
- * 
- */
 package br.com.rpires.exceptions;
 
-/**
- * @author rodrigo.pires
- *
- */
 public class MaisDeUmRegistroException extends Exception {
 
 	

@@ -5,12 +5,8 @@ import anotacao.Tabela;
 import anotacao.TipoChave;
 import br.com.rpires.dao.Persistente;
 
-import java.time.LocalDate; // Importação necessária para o tipo LocalDate
 
-/**
- * @author rodrigo.pires
- *
- */
+
 @Tabela("TB_CLIENTE")
 public class Cliente implements Persistente {
 	
@@ -40,7 +36,7 @@ public class Cliente implements Persistente {
     private String estado;
     
 	@ColunaTabela(dbName = "data_nascimento", setJavaName = "setDataNascimento") // Novo campo
-	private String dataNascimento; // Novo campo
+	private String dataNascimento; 
 
 	public String getNome() {
 		return nome;

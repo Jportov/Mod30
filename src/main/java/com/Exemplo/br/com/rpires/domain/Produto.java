@@ -1,6 +1,3 @@
-/**
- * 
- */
 package br.com.rpires.domain;
 
 import java.math.BigDecimal;
@@ -10,10 +7,7 @@ import anotacao.Tabela;
 import anotacao.TipoChave;
 import br.com.rpires.dao.Persistente;
 
-/**
- * @author rodrigo.pires
- *
- */
+
 @Tabela("TB_PRODUTO")
 public class Produto implements Persistente {
 	
@@ -33,9 +27,9 @@ public class Produto implements Persistente {
 	@ColunaTabela(dbName = "valor", setJavaName = "setValor")
 	private BigDecimal valor;
 
-	// Novo campo adicionado
+	
 	@ColunaTabela(dbName = "estoque", setJavaName = "setEstoque")
-	private Integer estoque; // Tipo Integer para a quantidade em estoque
+	private Integer estoque; 
 
 	public String getCodigo() {
 		return codigo;
